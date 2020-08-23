@@ -1,11 +1,11 @@
 
 import { message, Modal } from 'ant-design-vue';
 
+let service;
 
-export default function ({ $axios, store }, inject) {
-	console.log(store)
+export default function ({ $axios, store, redirect }, inject) {
   // Create a custom axios instance
-  const service = $axios.create({
+  service = $axios.create({
 		baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
 		timeout: 5000
 		// withCredentials: true
@@ -46,7 +46,7 @@ export default function ({ $axios, store }, inject) {
 						content: '请确定是否登出',
 						onOk() {
 							return new Promise((resolve, reject) => {
-								setTimeout(Math.random() > 0.5 ? (location.reload() & resolve) : reject, 1000);
+								setTimeout(Math.random() > 0.5 ? (redirect('/user/login') & resolve) : reject, 1000);
 							}).catch(() => console.log('Oops errors!'));
 						},
 						onCancel() {},
@@ -66,3 +66,5 @@ export default function ({ $axios, store }, inject) {
   // Inject to context as $service
   inject('service', service)
 }
+
+export const request = service

@@ -130,11 +130,11 @@
 </template>
 
 <script>
-// import md5 from "md5";
+import md5 from "md5";
 // import TwoStepCaptcha from "@/components/tools/TwoStepCaptcha";
 // import { mapActions } from "vuex";
 // import { timeFix } from "@/utils/util";
-// import { getSmsCaptcha, get2step } from "@/api/login";
+import { getSmsCaptcha, get2step } from "@/api/login";
 import { Token, RouteList } from '@/utils/redirectLogin';
 
 function timeFix () {
@@ -220,14 +220,14 @@ export default {
     };
   },
   created() {
-    // get2step({})
-    //   .then((res) => {
-    //     this.requiredTwoStepCaptcha = res.result.stepCode;
-    //   })
-    //   .catch(() => {
-    //     this.requiredTwoStepCaptcha = false;
-    //   });
-    this.requiredTwoStepCaptcha = true
+    get2step({})
+      .then((res) => {
+        this.requiredTwoStepCaptcha = res.result.stepCode;
+      })
+      .catch(() => {
+        this.requiredTwoStepCaptcha = false;
+      });
+    // this.requiredTwoStepCaptcha = true
   },
   methods: {
     // ...mapActions(["Login", "Logout"]),
@@ -247,46 +247,39 @@ export default {
       // this.form.resetFields()
     },
     handleSubmit(e) {
-      e.preventDefault();
-      const {
-        form: { validateFields },
-        state,
-        customActiveKey,
-        Login,
-      } = this;
-      state.loginBtn = true;
-      const validateFieldsKey =
-        customActiveKey === "tab1"
-          ? ["username", "password"]
-          : ["mobile", "captcha"];
-      validateFields(validateFieldsKey, { force: true }, (err, values) => {
-        if (!err) {
-          console.log("login form", values);
-          const loginParams = { ...values };
-          delete loginParams.username;
-          loginParams[!state.loginType ? "email" : "username"] =
-            values.username;
-					// loginParams.password = md5(values.password);
-					loginParams.password = values.password;
-					setTimeout(() => {
-						Token.set(values.username)
-						RouteList.set(JSON.stringify(menus))
-						state.loginBtn = false;
-
-						this.loginSuccess()
-					}, 1000)
-          // Login(loginParams)
-          //   .then((res) => this.loginSuccess(res))
-          //   .catch((err) => this.requestFailed(err))
-          //   .finally(() => {
-          //     state.loginBtn = false;
-          //   });
-        } else {
-          setTimeout(() => {
-            state.loginBtn = false;
-          }, 600);
-        }
-      });
+			e.preventDefault();
+			console.log(this)
+      // const {
+      //   form: { validateFields },
+      //   state,
+      //   customActiveKey,
+      //   Login,
+      // } = this;
+      // state.loginBtn = true;
+      // const validateFieldsKey =
+      //   customActiveKey === "tab1"
+      //     ? ["username", "password"]
+      //     : ["mobile", "captcha"];
+      // validateFields(validateFieldsKey, { force: true }, (err, values) => {
+      //   if (!err) {
+      //     console.log("login form", values);
+      //     const loginParams = { ...values };
+      //     delete loginParams.username;
+      //     loginParams[!state.loginType ? "email" : "username"] =
+      //       values.username;
+			// 		loginParams.password = md5(values.password);
+      //     Login(loginParams)
+      //       .then((res) => this.loginSuccess(res))
+      //       .catch((err) => this.requestFailed(err))
+      //       .finally(() => {
+      //         state.loginBtn = false;
+      //       });
+      //   } else {
+      //     setTimeout(() => {
+      //       state.loginBtn = false;
+      //     }, 600);
+      //   }
+      // });
     },
     getCaptcha(e) {
       e.preventDefault();
@@ -305,23 +298,23 @@ export default {
             }
           }, 1000);
           const hide = this.$message.loading("验证码发送中..", 0);
-          // getSmsCaptcha({ mobile: values.mobile })
-          //   .then((res) => {
-          //     setTimeout(hide, 2500);
-          //     this.$notification["success"]({
-          //       message: "提示",
-          //       description:
-          //         "验证码获取成功，您的验证码为：" + res.result.captcha,
-          //       duration: 8,
-          //     });
-          //   })
-          //   .catch((err) => {
-          //     setTimeout(hide, 1);
-          //     clearInterval(interval);
-          //     state.time = 60;
-          //     state.smsSendBtn = false;
-          //     this.requestFailed(err);
-          //   });
+          getSmsCaptcha({ mobile: values.mobile })
+            .then((res) => {
+              setTimeout(hide, 2500);
+              this.$notification["success"]({
+                message: "提示",
+                description:
+                  "验证码获取成功，您的验证码为：" + res.result.captcha,
+                duration: 8,
+              });
+            })
+            .catch((err) => {
+              setTimeout(hide, 1);
+              clearInterval(interval);
+              state.time = 60;
+              state.smsSendBtn = false;
+              this.requestFailed(err);
+            });
         }
       });
     },

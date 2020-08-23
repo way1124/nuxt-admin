@@ -13,21 +13,26 @@
 </template>
 
 <script>
+import { login } from "@/api/login";
 export default {
   data() {
     return {
-      project: '1111'
-    }
+      project: "1111",
+    };
   },
   asyncData(context) {
-    return { project: 'nuxt' }
+    return { project: "nuxt" };
   },
   methods: {
     async primary() {
-      const res = await this.$service.get('/api/user/info')
-      console.log(res)
-    }
-  }
+      login({
+        username: "",
+        password: "",
+        remember_me: true,
+        captcha: "12345",
+      });
+    },
+  },
 };
 </script>
 
